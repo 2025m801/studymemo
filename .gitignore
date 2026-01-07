@@ -1,0 +1,16 @@
+# 仮想環境
+venv/
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Editor
+.vscode/
+.idea/
+.DS_Store
+
+# Django
+db.sqlite3
+*.log
