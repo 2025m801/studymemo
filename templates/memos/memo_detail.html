@@ -1,0 +1,18 @@
+{% extends "memos/base.html" %}
+{% block title %}詳細{% endblock %}
+{% block content %}
+<h3>{{ memo.title }}</h3>
+<div class="text-muted small mb-3">
+  {% if memo.subject %}科目: {{ memo.subject.name }} / {% endif %}
+  重要度: ★{{ memo.importance }} / 理解度: {{ memo.understanding }}/5
+</div>
+
+<div class="mb-3">{{ memo.content|linebreaks }}</div>
+
+{% if memo.tags %}<div class="mb-2"><span class="badge text-bg-secondary">{{ memo.tags }}</span></div>{% endif %}
+{% if memo.next_action %}<div class="alert alert-warning">次にやること: {{ memo.next_action }}</div>{% endif %}
+
+<a class="btn btn-primary" href="{% url 'memo_update' memo.id %}">編集</a>
+<a class="btn btn-danger" href="{% url 'memo_delete' memo.id %}">削除</a>
+<a class="btn btn-secondary" href="{% url 'memo_list' %}">一覧へ</a>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "memos/base.html" %}
+{% block content %}
+<h3>削除確認</h3>
+<p>「{{ memo.title }}」を削除しますか？</p>
+<form method="post">
+  {% csrf_token %}
+  <button class="btn btn-danger">削除する</button>
+  <a class="btn btn-secondary" href="{% url 'memo_detail' memo.id %}">戻る</a>
+</form>
+{% endblock %}

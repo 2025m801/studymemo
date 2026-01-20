@@ -1,25 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-   <title>タイムライン</title>
-</head>
-<body>
-   <h1>タイムライン</h1>
-   <h2>ログイン</h2>
-
-   <!-- 登录表单 POST 到 Django 内置 login URL -->
-   <form method="post" action="{% url 'login' %}">
-       {% csrf_token %}
-       {{ form.as_p }}
-       <button type="submit">ログイン</button>
-   </form>
-
-   {% if user.is_authenticated %}
-   <p>こんにちは、{{ user.username }} さん</p>
-   <form method="post" action="{% url 'logout' %}">
-       {% csrf_token %}
-       <button type="submit">ログアウト</button>
-   </form>
-   {% endif %}
-</body>
-</html>
+{% extends "memos/base.html" %}
+{% block content %}
+<h3>ログイン</h3>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button class="btn btn-primary">ログイン</button>
+  <a class="btn btn-link" href="{% url 'signup' %}">新規登録</a>
+</form>
+{% endblock %}

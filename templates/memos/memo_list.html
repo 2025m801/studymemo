@@ -1,0 +1,123 @@
+{% extends "memos/base.html" %}
+{% block title %}メモ一覧{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">メモ一覧</h3>
+  <div>
+    <a class="btn btn-secondary" href="{% url 'subject_create' %}">科目追加</a>
+    <a class="btn btn-primary" href="{% url 'memo_create' %}">新規作成</a>
+  </div>
+</div>
+
+<div class="alert alert-info d-flex justify-content-between align-items-center">
+  <div>
+    <strong>学習TIP:</strong> <span id="study-tip">読み込み中...</span>
+  </div>
+  <button class="btn btn-sm btn-outline-primary" id="tip-reload">更新</button>
+</div>
+
+<form class="row g-2 mb-3" method="get">
+  <div class="col-md-4">
+    <input class="form-control" name="q" placeholder="キーワード検索" value="{{ filters.q }}">
+  </div>
+  <div class="col-md-3">
+    <select class="form-select" name="subject">
+      <option value="">科目（全て）</option>
+      {% for s in subjects %}
+        <option value="{{ s.id }}" {% if filters.subject == s.id|stringformat:"s" %}selected{% endif %}>{{ s.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select class="form-select" name="imp">
+      <option value="">重要度（全て）</option>
+      {% for i in "12345" %}
+        <option value="{{ i }}" {% if filters.imp == i %}selected{% endif %}>★{{ i }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2 form-check mt-2 ms-2">
+    <input class="form-check-input" type="checkbox" value="1" name="fav" id="fav" {% if filters.fav == "1" %}checked{% endif %}>
+    <label class="form-check-label" for="fav">お気に入りのみ</label>
+  </div>
+  <div class="col-md-12">
+    <button class="btn btn-outline-dark">検索</button>
+  </div>
+</form>
+
+{% if memos %}
+  <div class="row row-cols-1 row-cols-md-2 g-3">
+    {% for memo in memos %}
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <h5 class="card-title mb-1">
+                <a href="{% url 'memo_detail' memo.id %}">{{ memo.title }}</a>
+              </h5>
+
+              
+              <button class="btn btn-sm btn-outline-warning fav-btn"
+                      data-memo-id="{{ memo.id }}">
+                {% if memo.is_favorite %}★{% else %}☆{% endif %}
+              </button>
+            </div>
+
+            <div class="text-muted small mb-2">
+              {% if memo.subject %}科目: {{ memo.subject.name }} / {% endif %}
+              重要度: ★{{ memo.importance }} / 更新: {{ memo.updated_at|date:"Y-m-d H:i" }}
+            </div>
+            {% if memo.tags %}
+              <div class="mb-2">
+                <span class="badge text-bg-secondary">{{ memo.tags }}</span>
+              </div>
+            {% endif %}
+            <p class="card-text text-truncate">{{ memo.content }}</p>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="alert alert-secondary">まだメモがありません。右上の「新規作成」から追加してください。</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // CSRF
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  }
+  const csrftoken = getCookie('csrftoken');
+
+  
+  async function loadTip() {
+    const res = await fetch("{% url 'study_tip_api' %}");
+    const data = await res.json();
+    document.getElementById("study-tip").textContent = data.tip;
+  }
+  document.getElementById("tip-reload").addEventListener("click", loadTip);
+  loadTip();
+
+  
+  document.querySelectorAll(".fav-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const memoId = btn.dataset.memoId;
+      const res = await fetch(`/api/memos/${memoId}/favorite/`, {
+        method: "POST",
+        headers: { "X-CSRFToken": csrftoken }
+      });
+      const data = await res.json();
+      if (data.ok) {
+        btn.textContent = data.is_favorite ? "★" : "☆";
+      } else {
+        alert("更新に失敗しました。ログイン状態を確認してください。");
+      }
+    });
+  });
+</script>
+{% endblock %}

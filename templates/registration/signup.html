@@ -1,0 +1,10 @@
+{% extends "memos/base.html" %}
+{% block content %}
+<h3>新規登録</h3>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button class="btn btn-primary">登録</button>
+  <a class="btn btn-secondary" href="{% url 'login' %}">戻る</a>
+</form>
+{% endblock %}
