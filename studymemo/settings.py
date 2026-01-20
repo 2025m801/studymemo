@@ -93,5 +93,10 @@ STATICFILES_STORAGE = (
     "whitenoise.storage.CompressedManifestStaticFilesStorage"
 )
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://studymemo.onrender.com",
+]
+
+
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
