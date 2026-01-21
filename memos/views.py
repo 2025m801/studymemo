@@ -135,16 +135,13 @@ def memo_favorite_toggle(request, pk):
 
 @login_required
 def study_tip_api(request):
-    """
-    外部API例：Quotable（英語の名言）を取得して返す
-    失敗してもアプリが落ちないように安全に処理する
-    """
     try:
-        r = requests.get("https://api.quotable.io/random?tags=wisdom|education", timeout=5)
+        r = requests.get("https://zenquotes.io/api/random", timeout=10)
         r.raise_for_status()
-        data = r.json()
-        tip = f"{data.get('content', '')} — {data.get('author', '')}".strip()
+        data = r.json()[0]
+        tip = f"{data.get('q','')} — {data.get('a','')}".strip()
     except Exception:
-        tip = "今日は短時間でも継続しよう（外部API取得に失敗）"
+        tip = "今日は短時間でも継続しよう"
 
     return JsonResponse({"tip": tip})
+
